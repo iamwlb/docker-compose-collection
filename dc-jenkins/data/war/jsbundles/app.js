@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 3195:
+/***/ 5740:
 /***/ (function(__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 
@@ -360,8 +360,9 @@ function mapChildrenItemsToDropdownItems(items) {
       onClick: () => {
         if (item.post || item.requiresConfirmation) {
           if (item.requiresConfirmation) {
-            if (confirm((item.text || item.displayName) + ": are you sure?")) {
-              // TODO I18N
+            dialog.confirm(item.displayName, {
+              message: item.message
+            }).then(() => {
               const form = document.createElement("form");
               form.setAttribute("method", item.post ? "POST" : "GET");
               form.setAttribute("action", item.url);
@@ -370,7 +371,7 @@ function mapChildrenItemsToDropdownItems(items) {
               }
               document.body.appendChild(form);
               form.submit();
-            }
+            });
           } else {
             fetch(item.url, {
               method: "post",
@@ -450,7 +451,7 @@ const INFO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><pat
 const SUCCESS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48zm108.25 138.29l-134.4 160a16 16 0 01-12 5.71h-.27a16 16 0 01-11.89-5.3l-57.6-64a16 16 0 1123.78-21.4l45.29 50.32 122.59-145.91a16 16 0 0124.5 20.58z" fill='currentColor'/></svg>`;
 const WARNING = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M449.07 399.08L278.64 82.58c-12.08-22.44-44.26-22.44-56.35 0L51.87 399.08A32 32 0 0080 446.25h340.89a32 32 0 0028.18-47.17zm-198.6-1.83a20 20 0 1120-20 20 20 0 01-20 20zm21.72-201.15l-5.74 122a16 16 0 01-32 0l-5.74-121.95a21.73 21.73 0 0121.5-22.69h.21a21.74 21.74 0 0121.73 22.7z" fill='currentColor'/></svg>`;
 const ERROR = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48zm0 319.91a20 20 0 1120-20 20 20 0 01-20 20zm21.72-201.15l-5.74 122a16 16 0 01-32 0l-5.74-121.94v-.05a21.74 21.74 0 1143.44 0z" fill='currentColor'/></svg>`;
-const CLOSE = (/* unused pure expression or super */ null && (`<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/></svg>`));
+const CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/></svg>`;
 ;// CONCATENATED MODULE: ./src/main/js/components/notifications/index.js
 
 
@@ -674,7 +675,570 @@ function tooltips_init() {
 /* harmony default export */ var tooltips = ({
   init: tooltips_init
 });
+;// CONCATENATED MODULE: ./src/main/js/components/stop-button-link/index.js
+
+function registerStopButton(link) {
+  let question = link.getAttribute("data-confirm");
+  let url = link.getAttribute("href");
+  link.addEventListener("click", function (e) {
+    e.preventDefault();
+    var execute = function () {
+      fetch(url, {
+        method: "post",
+        headers: crumb.wrap({})
+      });
+    };
+    if (question != null) {
+      dialog.confirm(question).then(() => {
+        execute();
+      });
+    } else {
+      execute();
+    }
+  });
+}
+function stop_button_link_init() {
+  behavior_shim.specify(".stop-button-link", "stop-button-link", 0, element => {
+    registerStopButton(element);
+  });
+}
+/* harmony default export */ var stop_button_link = ({
+  init: stop_button_link_init
+});
+;// CONCATENATED MODULE: ./src/main/js/components/confirmation-link/index.js
+
+function registerConfirmationLink(element) {
+  const post = element.getAttribute("data-post") === "true";
+  const href = element.getAttribute("data-url");
+  const message = element.getAttribute("data-message");
+  const title = element.getAttribute("data-title");
+  const destructive = element.getAttribute("data-destructive");
+  let type = "default";
+  if (destructive === "true") {
+    type = "destructive";
+  }
+  element.addEventListener("click", function (e) {
+    e.preventDefault();
+    dialog.confirm(title, {
+      message: message,
+      type: type
+    }).then(() => {
+      var form = document.createElement("form");
+      form.setAttribute("method", post ? "POST" : "GET");
+      form.setAttribute("action", href);
+      if (post) {
+        crumb.appendToForm(form);
+      }
+      document.body.appendChild(form);
+      form.submit();
+    }, () => {});
+    return false;
+  });
+}
+function confirmation_link_init() {
+  behavior_shim.specify("A.confirmation-link", "confirmation-link", 0, element => {
+    registerConfirmationLink(element);
+  });
+}
+/* harmony default export */ var confirmation_link = ({
+  init: confirmation_link_init
+});
+// EXTERNAL MODULE: ./.yarn/cache/jquery-npm-3.7.0-a02a382bf4-907785e133.zip/node_modules/jquery/dist/jquery.js
+var jquery = __webpack_require__(205);
+var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
+// EXTERNAL MODULE: ./.yarn/cache/window-handle-npm-1.0.1-369b8e9cbe-8f2c183a0d.zip/node_modules/window-handle/index.js
+var window_handle = __webpack_require__(30);
+// EXTERNAL MODULE: ./.yarn/cache/handlebars-npm-4.7.7-a9ccfabf80-1e79a43f5e.zip/node_modules/handlebars/dist/cjs/handlebars.runtime.js
+var handlebars_runtime = __webpack_require__(9856);
+var handlebars_runtime_default = /*#__PURE__*/__webpack_require__.n(handlebars_runtime);
+;// CONCATENATED MODULE: ./src/main/js/util/jenkins.js
+/**
+ * Jenkins JS Modules common utility functions
+ */
+
+
+
+var debug = false;
+var jenkins = {};
+
+// gets the base Jenkins URL including context path
+jenkins.baseUrl = function () {
+  var u = jquery_default()("head").attr("data-rooturl");
+  if (!u) {
+    u = "";
+  }
+  return u;
+};
+
+// awful hack to get around JSONifying things with Prototype taking over wrong. ugh. Prototype is the worst.
+jenkins.stringify = function (o) {
+  if (Array.prototype.toJSON) {
+    // Prototype f's this up something bad
+    var protoJSON = {
+      a: Array.prototype.toJSON,
+      o: Object.prototype.toJSON,
+      h: Hash.prototype.toJSON,
+      s: String.prototype.toJSON
+    };
+    try {
+      delete Array.prototype.toJSON;
+      delete Object.prototype.toJSON;
+      delete Hash.prototype.toJSON;
+      delete String.prototype.toJSON;
+      return JSON.stringify(o);
+    } finally {
+      if (protoJSON.a) {
+        Array.prototype.toJSON = protoJSON.a;
+      }
+      if (protoJSON.o) {
+        Object.prototype.toJSON = protoJSON.o;
+      }
+      if (protoJSON.h) {
+        Hash.prototype.toJSON = protoJSON.h;
+      }
+      if (protoJSON.s) {
+        String.prototype.toJSON = protoJSON.s;
+      }
+    }
+  } else {
+    return JSON.stringify(o);
+  }
+};
+
+/**
+ * redirect
+ */
+jenkins.goTo = function (url) {
+  window_handle.getWindow().location.replace(jenkins.baseUrl() + url);
+};
+
+/**
+ * Jenkins AJAX GET callback.
+ * If last parameter is an object, will be extended to jQuery options (e.g. pass { error: function() ... } to handle errors)
+ */
+jenkins.get = function (url, success, options) {
+  if (debug) {
+    console.log("get: " + url);
+  }
+  var args = {
+    url: jenkins.baseUrl() + url,
+    type: "GET",
+    cache: false,
+    dataType: "json",
+    success: success
+  };
+  if (options instanceof Object) {
+    jquery_default().extend(args, options);
+  }
+  jquery_default().ajax(args);
+};
+
+/**
+ * Jenkins AJAX POST callback, formats data as a JSON object post (note: works around prototype.js ugliness using stringify() above)
+ * If last parameter is an object, will be extended to jQuery options (e.g. pass { error: function() ... } to handle errors)
+ */
+jenkins.post = function (url, data, success, options) {
+  if (debug) {
+    console.log("post: " + url);
+  }
+
+  // handle crumbs
+  var headers = {};
+  var wnd = window_handle.getWindow();
+  var crumb;
+  if ("crumb" in options) {
+    crumb = options.crumb;
+  } else if ("crumb" in wnd) {
+    crumb = wnd.crumb;
+  }
+  if (crumb) {
+    headers[crumb.fieldName] = crumb.value;
+  }
+  var formBody = data;
+  if (formBody instanceof Object) {
+    if (crumb) {
+      formBody = jquery_default().extend({}, formBody);
+      formBody[crumb.fieldName] = crumb.value;
+    }
+    formBody = jenkins.stringify(formBody);
+  }
+  var args = {
+    url: jenkins.baseUrl() + url,
+    type: "POST",
+    cache: false,
+    dataType: "json",
+    data: formBody,
+    contentType: "application/json",
+    success: success,
+    headers: headers
+  };
+  if (options instanceof Object) {
+    jquery_default().extend(args, options);
+  }
+  jquery_default().ajax(args);
+};
+
+/**
+ *  handlebars setup, done for backwards compatibility because some plugins depend on it
+ */
+jenkins.initHandlebars = function () {
+  return (handlebars_runtime_default());
+};
+
+/**
+ * Load translations for the given bundle ID, provide the message object to the handler.
+ * Optional error handler as the last argument.
+ */
+jenkins.loadTranslations = function (bundleName, handler, onError) {
+  jenkins.get("/i18n/resourceBundle?baseName=" + bundleName, function (res) {
+    if (res.status !== "ok") {
+      if (onError) {
+        onError(res.message);
+      }
+      throw "Unable to load localization data: " + res.message;
+    }
+    var translations = res.data;
+    if ("undefined" !== typeof Proxy) {
+      translations = new Proxy(translations, {
+        get: function (target, property) {
+          if (property in target) {
+            return target[property];
+          }
+          if (debug) {
+            console.log('"' + property + '" not found in translation bundle.');
+          }
+          return property;
+        }
+      });
+    }
+    handler(translations);
+  });
+};
+
+/**
+ * Runs a connectivity test, calls handler with a boolean whether there is sufficient connectivity to the internet
+ */
+jenkins.testConnectivity = function (siteId, handler) {
+  // check the connectivity api
+  var testConnectivity = function () {
+    jenkins.get("/updateCenter/connectionStatus?siteId=" + siteId, function (response) {
+      if (response.status !== "ok") {
+        handler(false, true, response.message);
+      }
+
+      // Define statuses, which need additional check iteration via async job on the Jenkins master
+      // Statuses like "OK" or "SKIPPED" are considered as fine.
+      var uncheckedStatuses = ["PRECHECK", "CHECKING", "UNCHECKED"];
+      if (uncheckedStatuses.indexOf(response.data.updatesite) >= 0 || uncheckedStatuses.indexOf(response.data.internet) >= 0) {
+        setTimeout(testConnectivity, 100);
+      } else {
+        // Update site should be always reachable, but we do not require the internet connection
+        // if it's explicitly skipped by the update center
+        if (response.status !== "ok" || response.data.updatesite !== "OK" || response.data.internet !== "OK" && response.data.internet !== "SKIPPED") {
+          // no connectivity, but not fatal
+          handler(false, false);
+        } else {
+          handler(true);
+        }
+      }
+    }, {
+      error: function (xhr, textStatus, errorThrown) {
+        if (xhr.status === 403) {
+          jenkins.goTo("/login");
+        } else {
+          handler.call({
+            isError: true,
+            errorMessage: errorThrown
+          });
+        }
+      }
+    });
+  };
+  testConnectivity();
+};
+
+/**
+ * gets the window containing a form, taking in to account top-level iframes
+ */
+jenkins.getWindow = function ($form) {
+  $form = jquery_default()($form);
+  var wnd = window_handle.getWindow();
+  jquery_default()(top.document).find("iframe").each(function () {
+    var windowFrame = this.contentWindow;
+    var $f = jquery_default()(this).contents().find("form");
+    $f.each(function () {
+      if ($form[0] === this) {
+        wnd = windowFrame;
+      }
+    });
+  });
+  return wnd;
+};
+
+/**
+ * Builds a stapler form post
+ */
+jenkins.buildFormPost = function ($form) {
+  $form = jquery_default()($form);
+  var wnd = jenkins.getWindow($form);
+  var form = $form[0];
+  if (wnd.buildFormTree(form)) {
+    return $form.serialize() + "&" + jquery_default().param({
+      "core:apply": "",
+      Submit: "Save",
+      json: $form.find("input[name=json]").val()
+    });
+  }
+  return "";
+};
+
+/**
+ * Gets the crumb, if crumbs are enabled
+ */
+jenkins.getFormCrumb = function ($form) {
+  $form = jquery_default()($form);
+  var wnd = jenkins.getWindow($form);
+  return wnd.crumb;
+};
+
+/**
+ * Jenkins Stapler JSON POST callback
+ * If last parameter is an object, will be extended to jQuery options (e.g. pass { error: function() ... } to handle errors)
+ */
+jenkins.staplerPost = function (url, $form, success, options) {
+  $form = jquery_default()($form);
+  var postBody = jenkins.buildFormPost($form);
+  var crumb = jenkins.getFormCrumb($form);
+  jenkins.post(url, postBody, success, jquery_default().extend({
+    processData: false,
+    contentType: "application/x-www-form-urlencoded",
+    crumb: crumb
+  }, options));
+};
+/* harmony default export */ var util_jenkins = (jenkins);
+;// CONCATENATED MODULE: ./src/main/js/components/dialogs/index.js
+
+
+
+
+let _defaults = {
+  title: null,
+  message: null,
+  cancel: true,
+  maxWidth: "475px",
+  minWidth: "450px",
+  type: "default",
+  hideCloseButton: false,
+  allowEmpty: false,
+  submitButton: false
+};
+let _typeClassMap = {
+  default: "",
+  destructive: "jenkins-!-destructive-color"
+};
+util_jenkins.loadTranslations("jenkins.dialogs", function (localizations) {
+  window.dialog.translations = localizations;
+  _defaults.cancelText = localizations.cancel;
+  _defaults.okText = localizations.ok;
+});
+function Dialog(dialogType, options) {
+  this.dialogType = dialogType;
+  this.options = Object.assign({}, _defaults, options);
+  this.init();
+}
+Dialog.prototype.init = function () {
+  this.dialog = document.createElement("dialog");
+  this.dialog.classList.add("jenkins-dialog");
+  this.dialog.style.maxWidth = this.options.maxWidth;
+  this.dialog.style.minWidth = this.options.minWidth;
+  document.body.appendChild(this.dialog);
+  if (this.options.title != null) {
+    const title = createElementFromHtml(`<div class='jenkins-dialog__title'/>`);
+    this.dialog.appendChild(title);
+    title.innerText = this.options.title;
+  }
+  if (this.dialogType === "modal") {
+    if (this.options.content != null) {
+      const content = createElementFromHtml(`<div class='jenkins-dialog__contents jenkins-dialog__contents--modal'/>`);
+      content.appendChild(this.options.content);
+      this.dialog.appendChild(content);
+    }
+    if (this.options.hideCloseButton !== true) {
+      const closeButton = createElementFromHtml(`
+          <button class="jenkins-dialog__close-button jenkins-button">
+            <span class="jenkins-visually-hidden">Close</span>
+            ${CLOSE}
+          </button>
+        `);
+      this.dialog.appendChild(closeButton);
+      closeButton.addEventListener("click", () => this.dialog.dispatchEvent(new Event("cancel")));
+    }
+    this.dialog.addEventListener("click", function (e) {
+      if (e.target !== e.currentTarget) {
+        return;
+      }
+      this.dispatchEvent(new Event("cancel"));
+    });
+    this.ok = null;
+  } else {
+    this.form = null;
+    if (this.options.form != null && this.dialogType === "form") {
+      const contents = createElementFromHtml(`<div class='jenkins-dialog__contents'/>`);
+      this.form = this.options.form;
+      contents.appendChild(this.options.form);
+      this.dialog.appendChild(contents);
+      behavior_shim.applySubtree(contents, true);
+    }
+    if (this.options.message != null && this.dialogType !== "form") {
+      const message = createElementFromHtml(`<div class='jenkins-dialog__contents'/>`);
+      this.dialog.appendChild(message);
+      message.innerText = this.options.message;
+    }
+    if (this.dialogType === "prompt") {
+      let inputDiv = createElementFromHtml(`<div class="jenkins-dialog__input">
+          <input data-id="input" type="text" class='jenkins-input'></div>`);
+      this.dialog.appendChild(inputDiv);
+      this.input = inputDiv.querySelector("[data-id=input]");
+      if (!this.options.allowEmpty) {
+        this.input.addEventListener("input", () => this.checkInput());
+      }
+    }
+    this.appendButtons();
+    this.dialog.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (this.ok.disabled == false) {
+          this.ok.dispatchEvent(new Event("click"));
+        }
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        this.dialog.dispatchEvent(new Event("cancel"));
+      }
+    });
+  }
+};
+Dialog.prototype.checkInput = function () {
+  if (this.input.value.trim()) {
+    this.ok.disabled = false;
+  } else {
+    this.ok.disabled = true;
+  }
+};
+Dialog.prototype.appendButtons = function () {
+  const buttons = createElementFromHtml(`<div
+      class="jenkins-buttons-row jenkins-buttons-row--equal-width jenkins-dialog__buttons">
+      <button data-id="ok" type="${this.options.submitButton ? "submit" : "button"}" class="jenkins-button jenkins-button--primary ${_typeClassMap[this.options.type]}">${this.options.okText}</button>
+      <button data-id="cancel" class="jenkins-button">${this.options.cancelText}</button>
+    </div>`);
+  this.dialog.appendChild(buttons);
+  this.ok = buttons.querySelector("[data-id=ok]");
+  this.cancel = buttons.querySelector("[data-id=cancel]");
+  if (!this.options.cancel) {
+    this.cancel.style.display = "none";
+  } else {
+    this.cancel.addEventListener("click", e => {
+      e.preventDefault();
+      this.dialog.dispatchEvent(new Event("cancel"));
+    });
+  }
+  if (this.dialogType === "prompt" && !this.options.allowEmpty) {
+    this.ok.disabled = true;
+  }
+};
+Dialog.prototype.show = function () {
+  return new Promise((resolve, cancel) => {
+    this.dialog.showModal();
+    this.dialog.addEventListener("cancel", e => {
+      e.preventDefault();
+      this.dialog.remove();
+      cancel();
+    }, {
+      once: true
+    });
+    this.dialog.focus();
+    if (this.input != null) {
+      this.input.focus();
+    }
+    if (this.ok != null) {
+      this.ok.addEventListener("click", e => {
+        if (this.dialogType === "form" && this.options.submitButton) {
+          this.form.submit();
+        } else {
+          e.preventDefault();
+          let value = true;
+          if (this.dialogType === "prompt") {
+            value = this.input.value;
+          }
+          if (this.dialogType === "form") {
+            value = new FormData(this.form);
+          }
+          this.dialog.remove();
+          resolve(value);
+        }
+      }, {
+        once: true
+      });
+    }
+  });
+};
+function dialogs_init() {
+  window.dialog = {
+    modal: function (content, options) {
+      const defaults = {
+        content: content
+      };
+      options = Object.assign({}, defaults, options);
+      let dialog = new Dialog("modal", options);
+      dialog.show().then().catch(() => {});
+    },
+    alert: function (title, options) {
+      const defaults = {
+        title: title,
+        cancel: false
+      };
+      options = Object.assign({}, defaults, options);
+      let dialog = new Dialog("alert", options);
+      dialog.show().then().catch(() => {});
+    },
+    confirm: function (title, options) {
+      const defaults = {
+        title: title,
+        okText: window.dialog.translations.yes
+      };
+      options = Object.assign({}, defaults, options);
+      let dialog = new Dialog("confirm", options);
+      return dialog.show();
+    },
+    prompt: function (title, options) {
+      const defaults = {
+        title: title
+      };
+      options = Object.assign({}, defaults, options);
+      let dialog = new Dialog("prompt", options);
+      return dialog.show();
+    },
+    form: function (form, options) {
+      const defaults = {
+        form: form,
+        minWidth: "600px",
+        maxWidth: "900px",
+        submitButton: true,
+        okText: window.dialog.translations.submit
+      };
+      options = Object.assign({}, defaults, options);
+      let dialog = new Dialog("form", options);
+      return dialog.show();
+    }
+  };
+}
+/* harmony default export */ var dialogs = ({
+  init: dialogs_init
+});
 ;// CONCATENATED MODULE: ./src/main/js/app.js
+
+
+
 
 
 
@@ -683,6 +1247,9 @@ dropdowns.init();
 notifications.init();
 search_bar.init();
 tooltips.init();
+stop_button_link.init();
+confirmation_link.init();
+dialogs.init();
 
 /***/ })
 
@@ -747,6 +1314,18 @@ tooltips.init();
 /******/ 				}
 /******/ 			}
 /******/ 			return result;
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	!function() {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = function(module) {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				function() { return module['default']; } :
+/******/ 				function() { return module; };
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
 /******/ 		};
 /******/ 	}();
 /******/ 	
@@ -849,7 +1428,7 @@ tooltips.init();
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [216], function() { return __webpack_require__(3195); })
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [216], function() { return __webpack_require__(5740); })
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
