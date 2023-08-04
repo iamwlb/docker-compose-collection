@@ -1,0 +1,13 @@
+version: '3.1' #版本号
+services: 
+  nginx:
+    restart: always 
+    image: bitnami/chartmuseum
+    container_name: chartmuseum #容器名
+    ports:
+      - 8080:8080 
+    volumes:  #数据卷映射地址
+      - ./data:/bitnami/data
+    environment:
+    - STORAGE=local
+    - STORAGE_LOCAL_ROOTDIR=/bitnami/data

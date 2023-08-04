@@ -1,0 +1,6 @@
+single-node/kafka/data/kafka
+single-node/zookeeper/data/zookeeper
+double-node/kafka1/data/kafka
+double-node/kafka2/data/kafka
+double-node/zookeeper1/data/zookeeper
+double-node/zookeeper2/data/zookeeper

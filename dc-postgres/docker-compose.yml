@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:13.4-buster
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    command: 'postgres -c shared_buffers=2GB -c max_connections=1000'
+    volumes:
+      - ./postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped

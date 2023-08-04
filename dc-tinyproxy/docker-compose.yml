@@ -1,0 +1,11 @@
+version: '3.5'
+services:
+  tinyproxy:
+    image: ajoergensen/tinyproxy
+    container_name: tinyproxy
+    restart: always
+    ports:
+      - 8888:8888
+    environment:
+    # 允许访问的网段
+      ALLOWED: "10.250.128.0/24"

@@ -1,0 +1,27 @@
+version: 0.1
+log:
+  level: debug
+storage:
+  delete:
+    enabled: true
+    cache:
+        blobdescriptor: inmemory
+    filesystem:
+        rootdirectory: /var/lib/registry
+  cache:
+    blobdescriptor: inmemory
+  filesystem: {}
+http:
+  addr: :5000
+  headers:
+    X-Content-Type-Options: [nosniff]
+    Access-Control-Allow-Origin: ['*']
+    Access-Control-Allow-Methods: ['HEAD', 'GET']
+auth:
+  htpasswd:
+    realm: basic-realm
+    path: /auth/htpasswd
+    access:
+      - name: admin
+        actions: ["*"]
+        resources: ["*"]

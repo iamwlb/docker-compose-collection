@@ -1,0 +1,11 @@
+
+version: '3'
+services:
+  pandora:
+    restart: always 
+    image: pengzhile/pandora
+    container_name: pandora 
+    ports: 
+    - "8899:8899"
+    environment: 
+      PANDORA_SERVER: 0.0.0.0

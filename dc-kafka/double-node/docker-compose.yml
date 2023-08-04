@@ -1,0 +1,53 @@
+version: '3'
+services:
+  zookeeper-1:
+    image: zookeeper:3.8
+    ports:
+      - "2181:2181"
+    volumes:
+      - "./zookeeper1/data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  zookeeper-2:
+    image: zookeeper:3.8
+    ports:
+      - "22181:2181"
+    volumes:
+      - "./zookeeper2/data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  
+  kafka-1:
+    image: kafka:3.2
+    ports:
+      - "9092:9092"
+    volumes:
+      - "./kafka1/data:/bitnami"
+      - "/etc/localtime:/etc/localtime"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:9092
+      - ALLOW_PLAINTEXT_LISTENER=no
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+
+  kafka-2:
+    image: kafka:3.2
+    ports:
+      - "29092:9092"
+    volumes:
+      - "./kafka2/data:/bitnami"
+      - "/etc/localtime:/etc/localtime"
+    environment:
+      - KAFKA_BROKER_ID=2
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper1:2181,zookeeper2:22181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:29092
+      - ALLOW_PLAINTEXT_LISTENER=no
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2

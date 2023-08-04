@@ -1,0 +1,5 @@
+# Ignore .DS_Store in current directory
+.DS_Store
+
+# Ignore .DS_Store in all subdirectories
+**/.DS_Store
